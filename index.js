@@ -72,11 +72,6 @@ switch(action) {
             console.log('[Warning]: path name is not defined');
             return;
         }
-    
-    // + get assets path 
-    // -    -> concat all css files
-    // -        -> add epam-css at the end
-    // -            -> put them into the bundle.css
 
         utils.streams.getCss(pathName);
         break;

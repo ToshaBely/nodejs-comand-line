@@ -38,8 +38,21 @@ module.exports.convertCSVToJSON = function (filePath) {
 }
 
 module.exports.getCss = function (pathName) {
-    request('https://www.epam.com/etc/clientlibs/foundation/main.min.fc69c13add6eae57cd247a91c7e26a15.css')
-        .pipe(fs.createWriteStream('bundle.css'));
+    const outStream = fs.createWriteStream(pathName + '/bundle.css');
+
+    fs.readdirSync(pathName)
+        .filter(file => /\.css$/.test(file))
+        .map(file => fs.createReadStream(pathName + '/' + file))
+        .reduce((prev, current) => {
+            if (prev != null) {
+                prev.on('end', () => current.pipe(outStream, {end: false}));
+            } else {
+                current.pipe(outStream, {end: false});
+            }
+            return current;
+        }, null)
+        .on('end', () => request('https://www.epam.com/etc/clientlibs/foundation/main.min.fc69c13add6eae57cd247a91c7e26a15.css')
+            .pipe(outStream));
 }
 
 // TODO: create handler for NOERR
